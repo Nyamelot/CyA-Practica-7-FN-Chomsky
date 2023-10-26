@@ -6,4 +6,25 @@
 // Autor: José Ángel Portillo García
 // Correo: alu0101568232@ull.edu.es
 // Fecha: 26/10/2023
-// Archivo main.cc: programa principal
+
+#ifndef CFG_H
+#define CFG_H
+
+#include <iostream>
+#include <set>
+#include <string>
+
+#include "alphabet.h"
+
+void Usage(int argc, char* argv[]);
+
+class CFG {
+ public:
+
+ private:
+  Alphabet terminals_;
+  std::set<std::string> non_terminals_;
+  std::string axiom_;
+};
+
+#endif

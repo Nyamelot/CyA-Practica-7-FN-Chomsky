@@ -6,4 +6,14 @@
 // Autor: José Ángel Portillo García
 // Correo: alu0101568232@ull.edu.es
 // Fecha: 26/10/2023
-// Archivo main.cc: programa principal
+
+#include <iostream>
+
+#include "alphabet.h"
+
+std::ostream& operator<<(std::ostream& out, const Alphabet& alphabet) {
+   for (const auto& symbol : alphabet.GetAlphabet()) {
+     out << symbol << " ";
+   }
+  return out;
+}

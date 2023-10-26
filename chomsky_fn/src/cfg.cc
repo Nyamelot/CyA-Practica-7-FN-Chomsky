@@ -6,4 +6,3 @@
 // Autor: José Ángel Portillo García
 // Correo: alu0101568232@ull.edu.es
 // Fecha: 26/10/2023
-// Archivo main.cc: programa principal
