@@ -20,11 +20,20 @@ void Usage(int argc, char* argv[]);
 
 class CFG {
  public:
+  // Constructor
+  CFG(Alphabet alphabet) : terminals_(alphabet) {}
+
+  // Getters
+  inline const Alphabet GetTerminals() const { return terminals_; }
+  inline const std::set<char> GetNonTerminals() const { return non_terminals_; }
+  inline const char GetAxiom() const { return axiom_; }
+
+  // Methods
 
  private:
   Alphabet terminals_;
-  std::set<std::string> non_terminals_;
-  std::string axiom_;
+  std::set<char> non_terminals_;
+  char axiom_;
 };
 
 #endif
