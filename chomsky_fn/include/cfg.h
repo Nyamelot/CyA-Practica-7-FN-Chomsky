@@ -13,27 +13,37 @@
 #include <iostream>
 #include <set>
 #include <string>
+#include <map>
 
 #include "alphabet.h"
 
 void Usage(int argc, char* argv[]);
 
-class CFG {
+class Cfg {
  public:
   // Constructor
-  CFG(Alphabet alphabet) : terminals_(alphabet) {}
+  Cfg(Alphabet terminals, Alphabet non_terminals, char axiom) : 
+  terminals_(terminals), non_terminals_(non_terminals), axiom_(axiom) {}
 
   // Getters
   inline const Alphabet GetTerminals() const { return terminals_; }
-  inline const std::set<char> GetNonTerminals() const { return non_terminals_; }
+  inline const Alphabet GetNonTerminals() const { return non_terminals_; }
   inline const char GetAxiom() const { return axiom_; }
+  inline const std::multimap<char, std::string> GetProductions() const { return productions_; }
 
   // Methods
+  void AddProduction(char non_terminal, std::string expression);
+  void NullifyCounter();
+
+  // Operator Overloading
+  friend std::ostream& operator<<(std::ostream& out, const Cfg& grammar);
 
  private:
   Alphabet terminals_;
-  std::set<char> non_terminals_;
+  Alphabet non_terminals_;
   char axiom_;
+  std::multimap<char, std::string> productions_;
+
 };
 
 #endif

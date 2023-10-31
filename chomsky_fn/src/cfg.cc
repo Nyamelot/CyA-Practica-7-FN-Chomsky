@@ -10,6 +10,9 @@
 #include <string>
 #include <iomanip>
 #include <iostream>
+#include <set>
+
+#include "cfg.h"
 
 const std::string kTitle = "P07-Chomsky-Normal-Form";
 const std::string kHelpText =
@@ -54,5 +57,49 @@ void Usage(int argc, char* argv[]) {
     std::cerr << "Try " << argv[0] << " --help for more information."
               << std::endl;
     exit(EXIT_FAILURE);
+  }
+}
+
+std::ostream& operator<<(std::ostream& out, Cfg grammar) {
+  out << grammar.GetTerminals().GetAlphabet().size() << std::endl;
+  for (const auto& terminal : grammar.GetTerminals().GetAlphabet()) {
+    out << terminal << std::endl;
+  }
+  out << grammar.GetNonTerminals().GetAlphabet().size() << std::endl;
+  for (const auto& non_terminal : grammar.GetNonTerminals().GetAlphabet()) {
+    out << non_terminal << std::endl;
+  }
+  out << grammar.GetProductions().size() << std::endl;
+  for (const auto& production : grammar.GetProductions()) {
+    out << production.first << " " << production.second << std::endl;
+  }
+  return out;
+}
+
+void Cfg::AddProduction(char non_terminal, std::string expression) {
+  if (!non_terminals_.GetAlphabet().count(non_terminal)) {
+    std::cerr << "The non terminal does not match then list of non terminals" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  for (const auto& symbol : expression) {
+    if (!terminals_.GetAlphabet().count(symbol) && 
+    !non_terminals_.GetAlphabet().count(symbol)) {
+      std::cerr << "The expression does not match the list of terminals or the list of terminals" 
+      << std::endl;
+      exit(EXIT_FAILURE);
+    }
+  }
+  std::pair<char, std::string> production = {non_terminal, expression};
+  productions_.emplace(production);
+}
+
+void Cfg::NullifyCounter() {
+  std::set<char> null_non_terminals;
+  for (const auto& production : productions_) {
+    for(const auto& symbol : production.second) {
+      if (symbol == '&') {
+        null_non_terminals.emplace(production.first);
+      }
+    }
   }
 }
