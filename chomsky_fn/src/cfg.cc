@@ -60,6 +60,7 @@ void Usage(int argc, char* argv[]) {
   }
 }
 
+
 std::ostream& operator<<(std::ostream& out, Cfg grammar) {
   out << grammar.GetTerminals().GetAlphabet().size() << std::endl;
   for (const auto& terminal : grammar.GetTerminals().GetAlphabet()) {
@@ -76,29 +77,85 @@ std::ostream& operator<<(std::ostream& out, Cfg grammar) {
   return out;
 }
 
+
 void Cfg::AddProduction(char non_terminal, std::string expression) {
   if (!non_terminals_.GetAlphabet().count(non_terminal)) {
     std::cerr << "The non terminal does not match then list of non terminals" << std::endl;
     exit(EXIT_FAILURE);
   }
-  for (const auto& symbol : expression) {
+  /* for (const auto& symbol : expression) {
     if (!terminals_.GetAlphabet().count(symbol) && 
     !non_terminals_.GetAlphabet().count(symbol)) {
       std::cerr << "The expression does not match the list of terminals or the list of terminals" 
       << std::endl;
       exit(EXIT_FAILURE);
     }
-  }
+  } */
   std::pair<char, std::string> production = {non_terminal, expression};
   productions_.emplace(production);
 }
 
-void Cfg::NullifyCounter() {
+
+std::set<char> Cfg::NullifyCounter() {
   std::set<char> null_non_terminals;
   for (const auto& production : productions_) {
     for(const auto& symbol : production.second) {
       if (symbol == '&') {
         null_non_terminals.emplace(production.first);
+      }
+    }
+  }
+  for (const auto& null_non_terminal : null_non_terminals) {
+    for (const auto& production : productions_) {
+      for(const auto& symbol : production.second) {
+        if (symbol == null_non_terminal) {
+          null_non_terminals.emplace(production.first);
+        }
+      }
+    }
+  }
+  return null_non_terminals;
+}
+
+
+void Cfg::DeleteAndSubstituteEmptyProductions() {
+  std::set<char> empty_productions;
+
+  // Identify empty productions
+  for (auto it = productions_.begin(); it != productions_.end(); ) {
+    if (it->second.empty() || it->second == "&") {
+      empty_productions.insert(it->first);
+      it = productions_.erase(it);
+    } else {
+      ++it;
+    }
+  }
+
+  // Identify productions that have a non-terminal with an empty production
+  for (auto& production : productions_) {
+    std::string new_expression = production.second;
+    for (auto it = new_expression.begin(); it != new_expression.end(); ) {
+      if (empty_productions.count(*it) > 0) {
+        empty_productions.insert(production.first);
+        it = new_expression.erase(it);
+      } else {
+        ++it;
+      }
+    }
+    production.second = new_expression;
+  }
+}
+
+void Cfg::ChomskyNormalForm() {
+  for (const auto& production : productions_) {
+    if (production.second.size() >= 2) {
+      for (const auto& symbol : production.second) {
+        if(terminals_.GetAlphabet().count(symbol)) {
+          std::string chomsky_expression = "X";
+          std::pair<char, std::string> chomsky_production {production.first, chomsky_expression};
+          productions_.emplace(chomsky_production);
+          production.second.at(symbol);
+        }
       }
     }
   }

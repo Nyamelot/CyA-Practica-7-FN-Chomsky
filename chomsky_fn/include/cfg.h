@@ -33,10 +33,12 @@ class Cfg {
 
   // Methods
   void AddProduction(char non_terminal, std::string expression);
-  void NullifyCounter();
+  std::set<char> NullifyCounter();
+  void DeleteAndSubstituteEmptyProductions();
+  void ChomskyNormalForm();
 
   // Operator Overloading
-  friend std::ostream& operator<<(std::ostream& out, const Cfg& grammar);
+  friend std::ostream& operator<<(std::ostream& out, Cfg grammar);
 
  private:
   Alphabet terminals_;
